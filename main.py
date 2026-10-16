@@ -22,7 +22,12 @@ class RestaurantDatabase:
         self.initialize()
 
     def connect(self):
-        return sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path)
+        # SQLite only enforces foreign keys when the pragma is enabled on
+        # each connection; without this the ON DELETE CASCADE declared on
+        # order_items is silently ignored.
+        conn.execute("PRAGMA foreign_keys = ON")
+        return conn
 
     def initialize(self):
         with self.connect() as conn:
